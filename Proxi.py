@@ -1,30 +1,114 @@
+
 from tdmclient import ClientAsync
 
-def lire_capteurs():
+# Parametres du robot
+SEUIL_OBSTACLE = 2000
+VITESSE_AVANCE = 300
+VITESSE_ROTATION = 100
 
-    with ClientAsync() as client:
+with ClientAsync() as client:
 
-        async def programme():
+    async def programme():
 
-            with await client.lock() as node:
+        with await client.lock() as node:
 
-                await node.wait_for_variables({"prox.horizontal"})
+            # Attendre les variables du robot
+            await node.wait_for_variables({
+                "prox.horizontal",
+                "motor.left.target",
+                "motor.right.target"
+            })
 
-                # Attendre les premières actualisations
-                await client.sleep(1.0)
+            # Arreter le robot au demarrage
+            node.v.motor.left.target = 0
+            node.v.motor.right.target = 0
+            node.flush()
 
+            await client.sleep(1.0)
+
+            etat = "AVANCE"
+            direction = None
+
+            try:
                 while True:
 
-                    # Lire les 5 capteurs avant
-                    valeurs = list(node.v.prox.horizontal[:5])
+                    # Lire les capteurs
+                    capteurs = list(node.v.prox.horizontal)
 
-                    # Afficher les valeurs en temps réel
-                    print(valeurs)
+                    gauche = capteurs[1]
+                    centre = capteurs[2]
+                    droite = capteurs[3]
 
-                    # Attendre 100 ms
+                    # Detecter les obstacles
+                    obstaclegauche = gauche > SEUIL_OBSTACLE
+                    obstaclecentre = centre > SEUIL_OBSTACLE
+                    obstacledroite = droite > SEUIL_OBSTACLE
+
+                    obstacle = (
+                        obstaclegauche
+                        or obstaclecentre
+                        or obstacledroite
+                    )
+
+                    if etat == "AVANCE":
+
+                        if obstacle:
+
+                            etat = "TOURNE"
+
+                            if obstaclecentre:
+
+                                if gauche < droite:
+                                    direction = "GAUCHE"
+                                else:
+                                    direction = "DROITE"
+
+                            elif obstaclegauche:
+                                direction = "DROITE"
+
+                            elif obstacledroite:
+                                direction = "GAUCHE"
+
+                            print(
+                                "Obstacle detecte !",
+                                "Rotation :", direction
+                            )
+
+                    elif etat == "TOURNE":
+
+                        if not obstacle:
+                            etat = "AVANCE"
+                            direction = None
+                            print("Chemin libre !")
+
+                    # Choisir une seule commande moteur
+                    if etat == "AVANCE":
+
+                        node.v.motor.left.target = VITESSE_AVANCE
+                        node.v.motor.right.target = VITESSE_AVANCE
+
+                    elif direction == "DROITE":
+
+                        node.v.motor.left.target = VITESSE_ROTATION
+                        node.v.motor.right.target = -VITESSE_ROTATION
+
+                    elif direction == "GAUCHE":
+
+                        node.v.motor.left.target = -VITESSE_ROTATION
+                        node.v.motor.right.target = VITESSE_ROTATION
+
+                    # Envoyer les commandes
+                    node.flush()
+
                     await client.sleep(0.1)
 
-        client.run_async_program(programme)
+            finally:
 
+                # Arreter le robot en quittant
+                node.v.motor.left.target = 0
+                node.v.motor.right.target = 0
+                node.flush()
 
-lire_capteurs()
+                print("Robot arrete.")
+
+    client.run_async_program(programme)
