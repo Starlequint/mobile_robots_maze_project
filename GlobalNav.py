@@ -39,12 +39,7 @@ class global_nav :
         path.append((x_new, y_new))
         path.reverse()
 
-
-        image_chemin = np.copy(self.map)
-        for x, y in path :
-            image_chemin[x][y] = 2;
-
-        return path, image_chemin
+        return path
 
 
     def find_path(self):
@@ -105,17 +100,32 @@ class global_nav :
 
     def update_new_obstacle(self,map):
         self.map = map
-        new_path, image_chemin = self.find_path()
-
-        image_chemin[self.thymio_pos[0]][self.thymio_pos[1]] = 3;
-        image_chemin[self.goal_pos[0]][self.goal_pos[1]] = 4;
-        return new_path, image_chemin
+        new_path = self.find_path()
+        return new_path
 
 
+#create a global_nav object and return it
+def init_global_nav(map, thymio_pos, goal_pos):
+    GlobalNav = global_nav(map, thymio_pos, goal_pos)
+    return GlobalNav
+
+#Return the path the thymio should follow and the matrix of the path on the map
+def update_global_nav(GlobalNav, map):
+    new_path = GlobalNav.update_new_obstacle(map)
+    path_taille_reelle = update_path(new_path)
+    return path_taille_reelle
 
 
+def update_path(path):
+    for element in path:
+        path[element] = path[element] * 15
+    return path
 
-        
+"""
+def update_thymio_pos(GlobalNav, thymio_pos):
+    GlobalNav.thymio_pos = thymio_pos
+"""
+
 def main() :
     plt.ion(); 
 
@@ -235,6 +245,6 @@ def main() :
 
 
 
-main()
+
 
 
