@@ -10,8 +10,8 @@ import time
 FORWARD_SPEED = 150
 ROTATION_SPEED = 70
 
-K_STOP_LEFT = 0.00252
-K_STOP_RIGHT = 0.00327
+K_STOP_LEFT = 0.00400
+K_STOP_RIGHT = 0.00450
 BRAKING_TIME = 0.5
 
 Kp_angle = 80
@@ -23,8 +23,8 @@ MOTOR_BIAS = 0
 DT = 0.05
 
 # Provisional tolerances
-WAYPOINT_TOLERANCE = 0.02
-ANGLE_TOLERANCE = 0.10
+WAYPOINT_TOLERANCE = 0.01
+ANGLE_TOLERANCE = 0.02
 MAX_FORWARD_ERROR = 0.35
 
 
@@ -446,3 +446,5 @@ async def move_along_path(
     await client.sleep(DT)
 
     return waypoint_index, mode, False
+
+
