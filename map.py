@@ -35,20 +35,6 @@ detector = cv2.aruco.ArucoDetector(dictionary)
 # ==========================================
 # DETECT THE FOUR CORNERS OF THE BOARD
 # ==========================================
-# def draw_layout_view(detection, highlighted=None) -> np.ndarray:
-#     """Warped paper keyboard with the AZERTY key boxes drawn on top."""
-#     view = cv2.cvtColor(cv2.cvtColor(detection.warped, cv2.COLOR_BGR2GRAY),
-#                         cv2.COLOR_GRAY2BGR)
-#     highlighted = highlighted or set()
-#     for name, (x0, y0, x1, y1) in LAYOUT_KEYS.items():
-#         a, b = (int(x0), int(y0)), (int(x1), int(y1))
-#         if name in highlighted:
-#             cv2.rectangle(view, a, b, (0, 255, 0), -1)
-#         cv2.rectangle(view, a, b, (0, 160, 0), 1)
-#         label = ASCII_LABEL.get(name, name if name.isascii() else "")
-#         cv2.putText(view, label, (a[0] + 2, b[1] - 4), cv2.FONT_HERSHEY_SIMPLEX,
-#                     0.3, (0, 0, 255), 1, cv2.LINE_AA)
-#     return view
 
 def detect_board(frame):
 
@@ -61,6 +47,15 @@ def detect_board(frame):
 
     for marker_id, corner in zip(ids.flatten(), corners):
         markers[int(marker_id)] = corner[0]
+        pts = corner[0].astype(np.int32)
+        
+        cv2.polylines(
+            frame,
+            [pts],
+            isClosed=True,
+            color=(255, 0, 255),  # Pink in BGR
+            thickness=3
+        )
 
     # Require all four markers
     if not all(i in markers for i in range(4)):
