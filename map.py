@@ -35,20 +35,20 @@ detector = cv2.aruco.ArucoDetector(dictionary)
 # ==========================================
 # DETECT THE FOUR CORNERS OF THE BOARD
 # ==========================================
-def draw_layout_view(detection, highlighted=None) -> np.ndarray:
-    """Warped paper keyboard with the AZERTY key boxes drawn on top."""
-    view = cv2.cvtColor(cv2.cvtColor(detection.warped, cv2.COLOR_BGR2GRAY),
-                        cv2.COLOR_GRAY2BGR)
-    highlighted = highlighted or set()
-    for name, (x0, y0, x1, y1) in LAYOUT_KEYS.items():
-        a, b = (int(x0), int(y0)), (int(x1), int(y1))
-        if name in highlighted:
-            cv2.rectangle(view, a, b, (0, 255, 0), -1)
-        cv2.rectangle(view, a, b, (0, 160, 0), 1)
-        label = ASCII_LABEL.get(name, name if name.isascii() else "")
-        cv2.putText(view, label, (a[0] + 2, b[1] - 4), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.3, (0, 0, 255), 1, cv2.LINE_AA)
-    return view
+# def draw_layout_view(detection, highlighted=None) -> np.ndarray:
+#     """Warped paper keyboard with the AZERTY key boxes drawn on top."""
+#     view = cv2.cvtColor(cv2.cvtColor(detection.warped, cv2.COLOR_BGR2GRAY),
+#                         cv2.COLOR_GRAY2BGR)
+#     highlighted = highlighted or set()
+#     for name, (x0, y0, x1, y1) in LAYOUT_KEYS.items():
+#         a, b = (int(x0), int(y0)), (int(x1), int(y1))
+#         if name in highlighted:
+#             cv2.rectangle(view, a, b, (0, 255, 0), -1)
+#         cv2.rectangle(view, a, b, (0, 160, 0), 1)
+#         label = ASCII_LABEL.get(name, name if name.isascii() else "")
+#         cv2.putText(view, label, (a[0] + 2, b[1] - 4), cv2.FONT_HERSHEY_SIMPLEX,
+#                     0.3, (0, 0, 255), 1, cv2.LINE_AA)
+#     return view
 
 def detect_board(frame):
 
@@ -157,20 +157,16 @@ def detect_thymio(frame, H):
             x, y = center_board
             fx, fy = front_board
 
-            # Orientation: 0 degrees = right, 90 degrees = up
+            # Orientation
             theta = np.degrees(
                 np.arctan2(y - fy, fx - x)
             ) % 360
 
-            # Position in m from top-left corner of the board
+            # Position in meters
             x_m = x / CELL_PX * CELL_SIZE_M
             y_m = y / CELL_PX * CELL_SIZE_M
 
-
-            # col = x / CELL_PX
-            # row = y / CELL_PX
-
-            return x_m, y_m, theta
+            return x_m, y_m, theta, pts
 
     return None
 # ==========================================
@@ -240,7 +236,29 @@ while True:
         pose = detect_thymio(frame, H)
 
         if pose is not None:
-            x, y, theta = pose
+            x, y, theta, pts = pose
+
+            # Draw pink square around the detected beacon
+            pts = pts.astype(np.int32)
+
+            cv2.polylines(
+                frame,
+                [pts],
+                isClosed=True,
+                color=(255, 0, 255),  # Pink in BGR
+                thickness=3
+            )
+
+            # Draw pink square at the center
+            center = np.mean(pts, axis=0).astype(int)
+
+            cv2.rectangle(
+                frame,
+                (center[0] - 5, center[1] - 5),
+                (center[0] + 5, center[1] + 5),
+                (255, 0, 255),
+                -1
+            )
 
             cv2.putText(frame, f"X: {x:.2f}", (20, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
