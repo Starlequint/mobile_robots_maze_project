@@ -3,7 +3,6 @@ import numpy as np
 import heapq
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors  
-import cv2
 
 
 class cells :
@@ -26,6 +25,11 @@ class global_nav :
         self.directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
 
+    def path_taille_relle(self, path):
+        for element in path:
+            path[element[0]] = 7.5 + path[element[0]] * 15
+            path[element[1]] = 7.5 + path[element[1]] * 15
+        return path
 
 
     def generate_path(self,cell_grid, x_new, y_new):
@@ -38,6 +42,8 @@ class global_nav :
 
         path.append((x_new, y_new))
         path.reverse()
+
+        path = self.path_taille_relle(path)
 
         return path
 
@@ -104,27 +110,6 @@ class global_nav :
         return new_path
 
 
-#create a global_nav object and return it
-def init_global_nav(map, thymio_pos, goal_pos):
-    GlobalNav = global_nav(map, thymio_pos, goal_pos)
-    return GlobalNav
-
-#Return the path the thymio should follow and the matrix of the path on the map
-def update_global_nav(GlobalNav, map):
-    new_path = GlobalNav.update_new_obstacle(map)
-    path_taille_reelle = update_path(new_path)
-    return path_taille_reelle
-
-
-def update_path(path):
-    for element in path:
-        path[element] = path[element] * 15
-    return path
-
-"""
-def update_thymio_pos(GlobalNav, thymio_pos):
-    GlobalNav.thymio_pos = thymio_pos
-"""
 
 def main() :
     plt.ion(); 
