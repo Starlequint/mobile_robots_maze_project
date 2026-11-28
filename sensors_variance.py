@@ -173,18 +173,20 @@ def calibrate_sensor(read_function, name):
 # ============================================================
 # MAIN
 # ============================================================
+from position_from_IR_sensors import position_from_ir_sensors
+
 
 if __name__ == "__main__":
 
     R_ir = calibrate_sensor(
-        read_ir,
+        position_from_ir_sensors,
         "INFRARED"
     )
 
-    R_enc = calibrate_sensor(
-        read_encoder,
-        "ENCODER"
-    )
+    # R_enc = calibrate_sensor(
+    #     read_encoder,
+    #     "ENCODER"
+    # )
 
     print("\n\n====================================")
     print("FINAL KALMAN MATRICES")
@@ -193,5 +195,5 @@ if __name__ == "__main__":
     print("\nR_ir =")
     print(repr(R_ir))
 
-    print("\nR_enc =")
-    print(repr(R_enc))
+    # print("\nR_enc =")
+    # print(repr(R_enc))

@@ -190,9 +190,14 @@ def identify_wall(origin, theta, cell, resolution):
 # ==========================================================
 
 def position_from_ir_sensors(
-    pos_cam, theta_cam,
-    pos_enc, theta_enc,
-    obstacle_map, resolution, node
+    pos_cam=(0.1,0.1), theta_cam=0,
+    pos_enc=None, theta_enc=None,
+    obstacle_map= [
+            [1, 1, 1, 1],
+            [1, 1, 1, 1],
+            [1, 1, 1, 1],
+            [1, 1, 1, 1]
+        ], resolution=0.02, node=None
 ):
     # Select reference pose.
     if valid_pose(pos_cam, theta_cam):
