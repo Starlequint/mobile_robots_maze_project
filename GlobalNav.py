@@ -5,6 +5,8 @@ import numpy as np
 import Affichage
 import cv2
 
+SQUARE_SIZE = 0.149
+
 class cells :
     def __init__(self):
         self.f = float('inf')
@@ -18,9 +20,16 @@ class cells :
 
 class global_nav :
 
-    def __init__(self, map, thymio_pos, goal_pos):
+    def Thymio_pos_on_matrix(self, thymio_pos):
+        row = int(thymio_pos[1] / SQUARE_SIZE)
+        col = int(thymio_pos[0] / SQUARE_SIZE)
+        print (row, col)
+        return (row, col)
+
+    def __init__(self, map, thymio_pos_m, goal_pos):
         self.map = map #map of obstacles, binary
-        self.thymio_pos = thymio_pos
+        self.thymio_pos_m = thymio_pos_m
+        self.thymio_pos = self.Thymio_pos_on_matrix(thymio_pos_m) #position of thymio in the matrix
         self.goal_pos = goal_pos
         self.directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
@@ -30,8 +39,10 @@ class global_nav :
         (75 + x * 150, 75 + y * 150)
         for x, y in path
         ]
-        print(path[0])
+        #print(path[0])
         return scaled_path
+
+
 
 
     def generate_path(self,cell_grid, x_new, y_new):
@@ -202,13 +213,13 @@ def main() :
     ]   '''
     
 
-    pos = [0, 0]
+    pos = [0.030, 0.110]
     dest = [2, 1]
     GlobalNav = global_nav(grid, pos, dest)
 
     path = GlobalNav.find_path()
     print(path)
-    image_with_path = Affichage.draw_path_on_image(cv2.imread("quadrillage.jpg"), path, (75, 75), 30, 20, np.array([[0, 0], [0, 0], [0, 0]], np.int32), grid)
+    image_with_path = Affichage.draw_path_on_image(cv2.imread("quadrillage.jpg"), path, pos, 30, 20, np.array([[0, 0], [0, 0], [0, 0]], np.int32), grid)
     cv2.imshow("Image with Path", image_with_path)
     cv2.waitKey(0)
     cv2.destroyAllWindows()

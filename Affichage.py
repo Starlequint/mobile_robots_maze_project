@@ -4,8 +4,8 @@ import math
 
 
 #constantes
-NOMBRE_CASES_X = 4
-NOMBRE_CASES_Y = 4
+NOMBRE_CASES_X = 7
+NOMBRE_CASES_Y = 5
 COLOR_GREEN = (0, 255, 0)
 COLOR_GRAY = (30, 30, 30)
 COLOR_RED = (0, 0, 255)
@@ -14,6 +14,7 @@ TRANSPARENCY = 0.5
 DOT_RADIUS = 8
 LINE_THICKNESS = 2
 ARROW_LENGTH = 80
+CONVERSION_TO_M = 1000
 
 
 
@@ -22,9 +23,10 @@ def draw_path_on_image(image, path, thymio_pos, orientation, rond_incertitude, t
     height, width = image.shape[:2]
     taille_case = 150
     overlay = image.copy()
+    
     scalingx = width /(NOMBRE_CASES_X*taille_case) 
     scalingy = height /(NOMBRE_CASES_Y*taille_case)
-    thymio_pos = (int(thymio_pos[0] * scalingx), int(thymio_pos[1] * scalingy))  # Ensure thymio_pos is in integer pixel coordinates
+    thymio_pos = (int(thymio_pos[0] * scalingx*CONVERSION_TO_M), int(thymio_pos[1] * scalingy*CONVERSION_TO_M))  # Ensure thymio_pos is in integer pixel coordinates
 
     # Convert all path points to integer pixel coordinates first
     pixel_path = []
