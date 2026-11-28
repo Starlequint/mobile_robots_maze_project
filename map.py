@@ -7,8 +7,8 @@ import Affichage
 # PARAMETERS
 # ==========================================
 
-N_ROWS = 6
-N_COLS = 6
+N_ROWS = 5
+N_COLS = 7
 CELL_PX = 40
 CELL_SIZE_M = 0.15
 
@@ -124,6 +124,7 @@ def cam_find_ends(frame, H):
     pose = None
     pts_thymio = None
     arrival = None
+    arrival_pts = None
 
     if H is None:
         return pose, pts_thymio, arrival
@@ -173,9 +174,9 @@ def cam_find_ends(frame, H):
         elif marker_id == 5:
 
             arrival = (x_m, y_m)
-            arrival_pts = pts.copy()
+            arrival_pts = pts
         
-    return pose, pts_thymio, arrival, arrival_pts
+    return pose, pts_thymio, arrival, arrival_pts 
 
 def predict_position(pos, theta, d_left, d_right,
                      wheel_base=95, cell_size=15):
@@ -239,7 +240,7 @@ def position_from_encoders(pos, theta, dt):
 # ==========================================
 
 def main_loop():
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     history = deque(maxlen=N_STABLE)
     M_final = None
 
@@ -365,3 +366,4 @@ def main_loop():
     else:
         print("No complete calibration obtained.")
 
+main_loop()
