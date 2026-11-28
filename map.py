@@ -10,14 +10,14 @@ import Affichage
 N_ROWS = 5
 N_COLS = 7
 CELL_PX = 40
-CELL_SIZE_M = 0.15
+CELL_SIZE_M = 0.149
 
 BOARD_W = N_COLS * CELL_PX
 BOARD_H = N_ROWS * CELL_PX
 
 # White margin between ArUco and grid: 0 mm
 # Physical cell size: 15 cm
-OFFSET = 0 / 15 * CELL_PX
+OFFSET = 0 / 14.9 * CELL_PX
 
 # Number of frames for stabilizing the matrix
 N_STABLE = 5
