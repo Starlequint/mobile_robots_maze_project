@@ -4,8 +4,8 @@ import math
 
 
 #constantes
-NOMBRE_CASES_X = 4
-NOMBRE_CASES_Y = 4
+NOMBRE_CASES_X = 7
+NOMBRE_CASES_Y = 5
 COLOR_GREEN = (0, 255, 0)
 COLOR_GRAY = (30, 30, 30)
 COLOR_RED = (0, 0, 255)
