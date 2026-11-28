@@ -1,9 +1,9 @@
+from importlib.resources import path
 import math
-import numpy as np
 import heapq
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors  
-
+import numpy as np
+import Affichage
+import cv2
 
 class cells :
     def __init__(self):
@@ -26,10 +26,12 @@ class global_nav :
 
 
     def path_taille_relle(self, path):
-        for element in path:
-            path[element[0]] = 7.5 + path[element[0]] * 15
-            path[element[1]] = 7.5 + path[element[1]] * 15
-        return path
+        scaled_path = [
+        (75 + x * 150, 75 + y * 150)
+        for x, y in path
+        ]
+        print(path[0])
+        return scaled_path
 
 
     def generate_path(self,cell_grid, x_new, y_new):
@@ -37,10 +39,10 @@ class global_nav :
 
         while cell_grid[x_new][y_new].parent_x != self.thymio_pos[0] or cell_grid[x_new][y_new].parent_y != self.thymio_pos[1] :
 
-              path.append((x_new,y_new))
+              path.append((y_new,x_new))
               x_new, y_new = cell_grid[x_new][y_new].parent_x, cell_grid[x_new][y_new].parent_y 
 
-        path.append((x_new, y_new))
+        path.append((y_new, x_new))
         path.reverse()
 
         path = self.path_taille_relle(path)
@@ -112,9 +114,16 @@ class global_nav :
 
 
 def main() :
-    plt.ion(); 
 
     grid = [
+        [1, 1, 1, 1],
+        [0, 0, 0, 1],
+        [1, 1, 0, 1],
+        [1, 1, 1, 1]
+    ]
+
+
+    '''grid = [
 
     [1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
 
@@ -190,45 +199,22 @@ def main() :
     [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1],
  
     [1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1]
-    ]   
+    ]   '''
     
 
     pos = [0, 0]
-    dest = [8, 0]
-    grid[pos[0]][pos[1]] = 3;
-    grid[dest[0]][dest[1]] = 4;
-
+    dest = [2, 1]
     GlobalNav = global_nav(grid, pos, dest)
-    colorsList = ['black', 'white', 'green', 'blue', 'yellow']
-    CustomCmap = colors.ListedColormap(colorsList)
 
-    path, image_chemin = GlobalNav.find_path()
-    image_chemin[pos[0]][pos[1]] = 3;
-    image_chemin[dest[0]][dest[1]] = 4;
-
-    image = plt.matshow(grid, cmap=CustomCmap, vmin=0, vmax=4);
-    plt.pause(0.1);
-
-    image.set_data(image_chemin);
-
-    plt.pause(1);
-
-    grid2[pos[0]][pos[1]] = 3;
-    grid2[dest[0]][dest[1]] = 4;
-    image.set_data(grid2);
-    plt.pause(1);
-
-
-    path2, image_chemin2 = GlobalNav.update_new_obstacle(grid2);
-    image.set_data(image_chemin2);
-
-
-
-    plt.ioff();
-    plt.show();
+    path = GlobalNav.find_path()
     print(path)
+    image_with_path = Affichage.draw_path_on_image(cv2.imread("quadrillage.jpg"), path, (75, 75), 30, 20, np.array([[0, 0], [0, 0], [0, 0]], np.int32), grid)
+    cv2.imshow("Image with Path", image_with_path)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
+main()
 
 
 
